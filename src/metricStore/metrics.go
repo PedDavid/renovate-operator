@@ -174,6 +174,13 @@ var (
 			Help: "Unix timestamp of the next planned scheduled run",
 		},
 		[]string{labelNamespace, labelJob})
+
+	renovateJobSuspended = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "renovate_operator_renovatejob_suspended",
+			Help: "Whether the RenovateJob is suspended (1) or not (0)",
+		},
+		[]string{labelNamespace, labelJob})
 )
 
 // Prometheus metrics — SRE: log quality (Group E).
@@ -184,6 +191,13 @@ var (
 			Help: "Count of WARN/ERROR log entries in the last run, by level",
 		},
 		[]string{labelNamespace, labelJob, labelProject, labelLevel})
+
+	configMigrationNeeded = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "renovate_operator_config_migration_needed",
+			Help: "Whether the last run detected that the Renovate config needs migration (1=needed, 0=clean)",
+		},
+		[]string{labelNamespace, labelJob, labelProject})
 )
 
 // Prometheus metrics — Results & outcomes (Group L).
@@ -343,8 +357,10 @@ func Register(registry ctrlmetrics.RegistererGatherer) {
 		// Group D
 		scheduleRuns,
 		scheduleNextRun,
+		renovateJobSuspended,
 		// Group E
 		logIssues,
+		configMigrationNeeded,
 		// Group L
 		openPullRequests,
 		repositoriesByStatus,
@@ -518,7 +534,7 @@ func AddRepositoriesFiltered(ctx context.Context, namespace, job, reason string,
 // Group D — scheduler
 // ---------------------------------------------------------------------------
 
-// IncScheduleRun counts a cron firing. result is "success" or "error".
+// IncScheduleRun counts a cron firing. result is "success", "error" or "skipped".
 func IncScheduleRun(ctx context.Context, namespace, job, result string) {
 	scheduleRuns.WithLabelValues(namespace, job, result).Inc()
 	addOtel(ctx, otelScheduleRuns, 1,
@@ -530,6 +546,27 @@ func SetScheduleNextRun(namespace, job string, unixSeconds float64) {
 	scheduleNextRun.WithLabelValues(namespace, job).Set(unixSeconds)
 }
 
+// DeleteScheduleNextRun drops the next planned run of a removed schedule, so a
+// stale timestamp does not read as an overdue run.
+func DeleteScheduleNextRun(namespace, job string) {
+	scheduleNextRun.DeleteLabelValues(namespace, job)
+}
+
+// SetRenovateJobSuspended records whether a RenovateJob is suspended.
+func SetRenovateJobSuspended(namespace, job string, suspended bool) {
+	value := 0.0
+	if suspended {
+		value = 1
+	}
+	renovateJobSuspended.WithLabelValues(namespace, job).Set(value)
+}
+
+// DeleteRenovateJobSuspended drops the series of a RenovateJob that is deleted or
+// whose effective spec cannot be resolved.
+func DeleteRenovateJobSuspended(namespace, job string) {
+	renovateJobSuspended.DeleteLabelValues(namespace, job)
+}
+
 // ---------------------------------------------------------------------------
 // Group E — log quality (gauge, Prometheus-only)
 // ---------------------------------------------------------------------------
@@ -537,6 +574,17 @@ func SetScheduleNextRun(namespace, job string, unixSeconds float64) {
 // SetLogIssues sets the count of log entries for a level ("warn" or "error").
 func SetLogIssues(namespace, job, project, level string, count int) {
 	logIssues.WithLabelValues(namespace, job, project, level).Set(float64(count))
+}
+
+// SetConfigMigrationNeeded sets the config-migration-needed gauge for a project (1=needed, 0=clean).
+// A nil value means the run had no debug logs, so the state is unknown; the metric is deleted
+// rather than set to a potentially misleading value.
+func SetConfigMigrationNeeded(namespace, job, project string, found *bool) {
+	if found == nil {
+		configMigrationNeeded.DeleteLabelValues(namespace, job, project)
+		return
+	}
+	configMigrationNeeded.WithLabelValues(namespace, job, project).Set(boolToFloat(*found))
 }
 
 // ---------------------------------------------------------------------------
@@ -689,6 +737,7 @@ func RehydrateMetrics(namespace, job string, projects map[string]api.RenovatePro
 		if project.LogIssues != nil {
 			SetLogIssues(namespace, job, name, "warn", project.LogIssues.WarnCount)
 			SetLogIssues(namespace, job, name, "error", project.LogIssues.ErrorCount)
+			SetConfigMigrationNeeded(namespace, job, name, project.LogIssues.HasConfigMigration)
 		}
 
 		if project.PRActivity != nil {
@@ -733,6 +782,7 @@ func DeleteProjectMetrics(namespace, job, project string) {
 	lastExecutionDuration.DeleteLabelValues(namespace, job, project)
 	logIssues.DeleteLabelValues(namespace, job, project, "warn")
 	logIssues.DeleteLabelValues(namespace, job, project, "error")
+	configMigrationNeeded.DeleteLabelValues(namespace, job, project)
 	// Note: projectRuns counter has an additional "status" label, so we delete both possible values
 	projectRuns.DeleteLabelValues(namespace, job, project, "completed")
 	projectRuns.DeleteLabelValues(namespace, job, project, "failed")

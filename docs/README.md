@@ -22,12 +22,14 @@ RenovateJob and Operator Settings to customize your experience.
 | Guide                                                       |                                                             |
 | ----------------------------------------------------------- | ----------------------------------------------------------- |
 | [Autodiscovery](./configuration/autodiscovery.md)             | Filters, topics, fork and pending-deletion exclusion        |
+| [Shared Templates](./configuration/shared-templates.md)       | Inherit common RenovateJob config from a template           |
 | [Authentication](./configuration/auth.md)                     | OIDC, GitHub OAuth, access control                          |
 | [Renovate Configuration](./configuration/renovate-config.md)  | Inline or ConfigMap-based Renovate config file              |
 | [Scheduling](./configuration/scheduling.md)                   | Node selectors, affinity, tolerations, priority classes     |
 | [Extra Volumes](./configuration/extra-volumes.md)             | Mounting ConfigMaps, Secrets, and ephemeral scratch volumes |
 | [Image Pull Secrets](./configuration/image-pull-secrets.md)   | Private registry authentication                             |
 | [Base Path](./configuration/base-path.md)                     | Serving the UI under a sub-path                             |
+| [Timezone](./configuration/timezone.md)                       | Per-schedule `CRON_TZ=` prefix and global `TZ` env var     |
 
 ## Self-Service
 
@@ -63,6 +65,7 @@ Day-2 concerns: observability, storage, and cost allocation.
 | [Valkey / Redis](./operations/valkey.md)                   | Session storage, log storage, and caching  |
 | [S3 Object Storage](./operations/s3.md)                    | Log archival and Renovate cache forwarding |
 | [Pod Label Templates](./operations/pod-label-templates.md) | Templated labels for cost allocation       |
+| [Suspending a RenovateJob](./operations/suspend.md)        | Pausing runs without stopping the operator |
 
 ## Security
 

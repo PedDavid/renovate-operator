@@ -1,5 +1,67 @@
 # Changelog
 
+## [6.5.1](https://github.com/mogenius/renovate-operator/compare/6.5.0...6.5.1) (2026-10-12)
+
+
+### Bug Fixes
+
+* disable ClusterRenovateJobTemplate watch and RBAC when ownNamespaceOnly is true ([92381fb](https://github.com/mogenius/renovate-operator/commit/92381fb314d015cf669c714d6691ffd0cf8677df)), closes [#723](https://github.com/mogenius/renovate-operator/issues/723)
+* refuse RenovateJobs referencing ClusterRenovateJobTemplate when cluster templates are disabled ([e09b207](https://github.com/mogenius/renovate-operator/commit/e09b2078feb56d3cf50d33a55ccdb1fe5656790f)), closes [#723](https://github.com/mogenius/renovate-operator/issues/723)
+
+## [6.5.0](https://github.com/mogenius/renovate-operator/compare/6.4.0...6.5.0) (2026-10-12)
+
+
+### Features
+
+* **operator:** add spec.suspend to pause a RenovateJob ([a020090](https://github.com/mogenius/renovate-operator/commit/a020090a0304e2d7726940b9ad77933c7587cbfe))
+* **ui:** let admins suspend and resume a RenovateJob from its card ([87e77e6](https://github.com/mogenius/renovate-operator/commit/87e77e6d8cf98ce1552107d5e72c106238f2206c))
+
+
+### Bug Fixes
+
+* **deps:** update aws-sdk-go-v2 monorepo ([627e5b8](https://github.com/mogenius/renovate-operator/commit/627e5b8b9a459f35041a64baa03833fb2cfaf143))
+* **deps:** update aws-sdk-go-v2 monorepo ([9299e8b](https://github.com/mogenius/renovate-operator/commit/9299e8b46d0ecd73420d00a0acd1ffb0eb780d4f))
+* **deps:** update go module directive to v1.27.2 ([30902d8](https://github.com/mogenius/renovate-operator/commit/30902d87b331ebeffef2fd8ccf1105e4df1addc5))
+* **deps:** update golang docker tag to v1.27.2 ([fa6c512](https://github.com/mogenius/renovate-operator/commit/fa6c512af66ae763183a424fb8d4f7075f15cb1f))
+* **deps:** update module github.com/alicebob/miniredis/v2 to v2.40.0 ([5b7bd78](https://github.com/mogenius/renovate-operator/commit/5b7bd789bf5435400500e399e46cf908511032db))
+* **deps:** update module github.com/aws/aws-sdk-go-v2/service/s3 to v1.114.2 ([703c76f](https://github.com/mogenius/renovate-operator/commit/703c76fb8bb81f0b8f3c9866de91e0415d230c99))
+* **deps:** update module github.com/prometheus/client_golang to v1.25.0 ([ebdfdf5](https://github.com/mogenius/renovate-operator/commit/ebdfdf514b0d782ecb1efbf223a0f5359a4a59b8))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.25.2 ([636e89c](https://github.com/mogenius/renovate-operator/commit/636e89c3f80cb7a04270f81dfa0efbf7f0b750aa))
+* **deps:** update opentelemetry ([2feb3a3](https://github.com/mogenius/renovate-operator/commit/2feb3a31d401dac3dc68315efa14255405fc3158))
+* **oidc:** append id_token_hint to RP-initiated logout redirect ([e12f01d](https://github.com/mogenius/renovate-operator/commit/e12f01d55ee70a4efdde2b1728d8c93741b577eb)), closes [#691](https://github.com/mogenius/renovate-operator/issues/691)
+* **webhooks:** add missing bitbucket case to WebhookEndpointPath ([6b4850a](https://github.com/mogenius/renovate-operator/commit/6b4850a9f0f9dadc4bc23bc3230e83e82882bad1)), closes [#702](https://github.com/mogenius/renovate-operator/issues/702)
+
+## [6.4.0](https://github.com/mogenius/renovate-operator/compare/6.3.0...6.4.0) (2026-09-28)
+
+
+### Features
+
+* adding keyboard navigation support for the ui ([1ddbd3a](https://github.com/mogenius/renovate-operator/commit/1ddbd3a79da0a0bf147dfbe4ab0553269818a131))
+* **metrics:** adding metrics wether a config-migration is needed for a repository ([a31d6d3](https://github.com/mogenius/renovate-operator/commit/a31d6d393da9d2b5ca43a9a5bbd8b5e6f8359afc)), closes [#667](https://github.com/mogenius/renovate-operator/issues/667)
+* new RenovateJobTemplate crds to define shared renovate configs ([542bf3e](https://github.com/mogenius/renovate-operator/commit/542bf3e6e6bae59f68c44a3b0e9fe83ef4495b39)), closes [#420](https://github.com/mogenius/renovate-operator/issues/420)
+* **valkey:** support connecting to a Valkey cluster ([12fb695](https://github.com/mogenius/renovate-operator/commit/12fb6955d6d44c57149fec345ac93743b8a4e7b8)), closes [#693](https://github.com/mogenius/renovate-operator/issues/693)
+
+
+### Bug Fixes
+
+* **deps:** update aws-sdk-go-v2 monorepo ([eb4b36b](https://github.com/mogenius/renovate-operator/commit/eb4b36b060e8d6f0181ee64dd7a6d9cc5eb7f9c2))
+* **deps:** update aws-sdk-go-v2 monorepo ([b4f3b5b](https://github.com/mogenius/renovate-operator/commit/b4f3b5beeaf36757f2e1eae8a8ccb19f44ee3cdc))
+* **deps:** update aws-sdk-go-v2 monorepo ([3ecf37d](https://github.com/mogenius/renovate-operator/commit/3ecf37dc8e6287483e688f55848ffeb67e756cf0))
+* **deps:** update kubernetes monorepo to v0.37.1 ([dd5fcde](https://github.com/mogenius/renovate-operator/commit/dd5fcde2d5bb6a437896989fd625c2cb5dcd3c13))
+* **deps:** update module github.com/netresearch/go-cron to v0.16.1 ([6c55d0f](https://github.com/mogenius/renovate-operator/commit/6c55d0ffd63b538dc1d06600fda30d2218d26d99))
+* **deps:** update module github.com/valkey-io/valkey-go to v1.0.78 ([548fcd7](https://github.com/mogenius/renovate-operator/commit/548fcd79dcfbfc33fcd5ffeba053726f0552169c))
+* **deps:** update module golang.org/x/oauth2 to v0.37.0 ([6b6e0c1](https://github.com/mogenius/renovate-operator/commit/6b6e0c15b87041242e60e3a0428a44b06aa0114e))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.25.1 ([1a46444](https://github.com/mogenius/renovate-operator/commit/1a46444ff245f2fcf9152200929f98eb7394be46))
+* **deps:** update node.js to v24.21.0 ([68783fc](https://github.com/mogenius/renovate-operator/commit/68783fc838cd4e3dc829d63224d222d7772373c2))
+* **deps:** update react monorepo to v19.3.0 ([7d19a1a](https://github.com/mogenius/renovate-operator/commit/7d19a1ae8e22491e9892d83dc2cc188063988aa3))
+* **deps:** update registry.k8s.io/kubectl docker tag to v1.37.1 ([8c00fa0](https://github.com/mogenius/renovate-operator/commit/8c00fa09447aef52f3b52c25641560303f03fb7b))
+* **discovery:** propagate Renovate's exit code from the discovery job ([5649b60](https://github.com/mogenius/renovate-operator/commit/5649b609c55965847efc5e372c0658a714b7a07b))
+* do not rely on secret list to set the owner reference ([347cb9c](https://github.com/mogenius/renovate-operator/commit/347cb9c6cc0e9f1fc7cbed780ff6b018425bf832))
+* redis secret name might get too long, use generate name ([20b66f0](https://github.com/mogenius/renovate-operator/commit/20b66f0ae34850049861792130708f7d1c31c613))
+* the redis/ valkey cache secret attaches to job lifecycle ([8ee0f21](https://github.com/mogenius/renovate-operator/commit/8ee0f21ad9eea8dd97dbb19be36e2ceaccee3418))
+* **ui:** redirect to login if unauthenticated read is not enabled anywhere ([da53dbd](https://github.com/mogenius/renovate-operator/commit/da53dbdd97ee8510a7d9f089f2859be81680134b)), closes [#601](https://github.com/mogenius/renovate-operator/issues/601)
+* **ui:** trigger only the projects the filters left visible ([97f60f0](https://github.com/mogenius/renovate-operator/commit/97f60f009d3c063ef16f03c88faee3abaf58d743)), closes [#626](https://github.com/mogenius/renovate-operator/issues/626)
+
 ## [6.3.0](https://github.com/mogenius/renovate-operator/compare/6.2.0...6.3.0) (2026-09-04)
 
 

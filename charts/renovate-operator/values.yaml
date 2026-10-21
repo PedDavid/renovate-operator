@@ -11,7 +11,7 @@ crd:
   image:
     registry: registry.k8s.io
     repository: kubectl
-    tag: v1.37.0
+    tag: v1.37.1
     pullPolicy: "IfNotPresent"
     # -- imagePullSecrets for the operator pod
     imagePullSecrets: []
@@ -313,6 +313,12 @@ authorization:
   # -- unaffected. Has no effect when no authentication provider is configured, since every
   # -- request is an admin in that case.
   enabled: true
+  # -- whether admins may suspend and resume a RenovateJob from the UI, from its card or all
+  # -- at once from the toolbar. The buttons write
+  # -- spec.suspend on the live object, so leave it off when a GitOps tool sets spec.suspend
+  # -- or replaces whole objects on sync: the next sync would undo the change without a word.
+  # -- See docs/operations/suspend.md.
+  suspendFromUI: false
   # -- default access rules. Each field applies to RenovateJobs that leave the matching field in
   # -- spec.access unset. A field the job does set replaces the default for that field instead of
   # -- adding to it, so a per-job spec.access can narrow access as well as widen it.
@@ -331,8 +337,9 @@ authorization:
     anonymousReadLogs: false
 
 rbac:
-  # -- if true no clusterrole and clusterrolebinding will be created, only role and rolebinding
-  # -- when enabled, the operator will only watch resources in the namespace it is deployed to
+  # -- if true no clusterrole and clusterrolebinding will be created, only role and rolebinding;
+  # -- the operator will only watch resources in its own namespace and ClusterRenovateJobTemplate
+  # -- support is disabled (no cluster-scoped RBAC, no watch).
   ownNamespaceOnly: false
   # -- optional: specify a custom namespace to watch (defaults to the release namespace when ownNamespaceOnly is true)
   watchNamespace: ""
@@ -466,6 +473,8 @@ logging:
 externalKeyValueStore:
   # -- whether the connection should be made with TLS encryption enabled (rediss://)
   useTls: false
+  # -- whether to connect to a cluster (redis+cluster://). All usages then share database 0.
+  cluster: false
   # -- host for the connection; alternatively provide via existingSecret.hostKey
   host: ~
   # -- port for the connection; alternatively provide via existingSecret.portKey
@@ -479,6 +488,7 @@ externalKeyValueStore:
     # -- name of the secret containing connection and authentication information
     name: ~
     # -- key containing the full connection url (e.g. "rediss://user:password@valkey:6379/0").
+    # -- Use "redis+cluster://" or "rediss+cluster://" to connect to a cluster.
     # -- When set, all other keys and clear values are ignored.
     urlKey: ~
     # -- key containing the host for the connection

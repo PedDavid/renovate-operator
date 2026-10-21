@@ -421,6 +421,8 @@ const REMAINING_VARIANT_KEYS = PROJECT_STATE_VARIANTS.map((variant) => variant.k
  */
 export const ADMIN_PERMISSIONS = ["logs", "trigger", "triggerAll", "cancel", "discovery"];
 export const READER_PERMISSIONS = ["logs"];
+/** An admin's permissions where the operator offers the suspend button. */
+export const SUSPEND_ADMIN_PERMISSIONS = [...ADMIN_PERMISSIONS, "suspend"];
 
 export function buildRenovateJob({
   name,
@@ -432,14 +434,16 @@ export function buildRenovateJob({
   platformEndpoint = "https://api.github.com",
   debug = false,
   accepted = true,
+  suspended = false,
+  // authorization.suspendFromUI: the operator offers the button, and an admin may use it.
+  suspendFromUI = false,
   role = "admin",
-  permissions = ADMIN_PERMISSIONS,
+  permissions = suspendFromUI ? SUSPEND_ADMIN_PERMISSIONS : ADMIN_PERMISSIONS,
 } = {}) {
-  return {
+  const job = {
     name,
     namespace,
     cronExpression,
-    nextSchedule: FIXED_NEXT_SCHEDULE,
     discoveryStatus,
     projects,
     platform,
@@ -449,6 +453,17 @@ export function buildRenovateJob({
     role,
     permissions,
   };
+  // Like the operator: `suspended` is only sent when true, and a suspended job
+  // has no next run to report.
+  if (suspended) {
+    job.suspended = true;
+  } else {
+    job.nextSchedule = FIXED_NEXT_SCHEDULE;
+  }
+  if (suspendFromUI) {
+    job.suspendFromUI = true;
+  }
+  return job;
 }
 
 /**

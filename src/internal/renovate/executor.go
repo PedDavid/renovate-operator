@@ -126,7 +126,7 @@ func (e *renovateExecutor) execute(ctx context.Context, options executionOptions
 		log.FromContext(ctx).V(2).Info("Executed renovate executor loop", "duration", duration)
 	}()
 
-	renovateJobs, err := e.manager.ListRenovateJobsFull(ctx)
+	renovateJobs, err := e.manager.ListEffectiveRenovateJobsFull(ctx)
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
@@ -281,10 +281,11 @@ func (e *renovateExecutor) ProcessProjectJobResult(ctx context.Context, k8sJob *
 		metricStore.IncJobFailure(ctx, jobId.Namespace, jobId.Name, "executor", jobFailureReason(k8sJob))
 	}
 
-	// Log issue counts (Group L).
+	// Log issue counts (Group E).
 	if newProjectStatus.LogIssues != nil {
 		metricStore.SetLogIssues(jobId.Namespace, jobId.Name, project, "warn", newProjectStatus.LogIssues.WarnCount)
 		metricStore.SetLogIssues(jobId.Namespace, jobId.Name, project, "error", newProjectStatus.LogIssues.ErrorCount)
+		metricStore.SetConfigMigrationNeeded(jobId.Namespace, jobId.Name, project, newProjectStatus.LogIssues.HasConfigMigration)
 	}
 
 	// Pull request activity (Group E/L). A nil PRActivity means the run yielded no
@@ -340,7 +341,7 @@ type scheduledCandidate struct {
 // acceptedCandidates flattens the Scheduled projects of every RenovateJob that passes
 // the operator's policy into one candidate list, recording per-job oldest wait for the
 // fairness sort. A job the policy refuses is skipped on its own; its siblings still
-// dispatch.
+// dispatch. So is a suspended job, whose projects stay queued until it is resumed.
 func (e *renovateExecutor) acceptedCandidates(ctx context.Context, renovateJobs []api.RenovateJob) []scheduledCandidate {
 	var candidates []scheduledCandidate
 
@@ -351,6 +352,11 @@ func (e *renovateExecutor) acceptedCandidates(ctx context.Context, renovateJobs 
 			metricStore.IncPolicyDenial(ctx, "destination")
 			log.FromContext(ctx).Error(err, "skipping RenovateJob refused by policy",
 				"renovateJob", renovateJob.Name, "namespace", renovateJob.Namespace)
+			continue
+		}
+
+		// After the policy check, so suspending a job never hides its policy denials.
+		if renovateJob.Spec.GetSuspend() {
 			continue
 		}
 

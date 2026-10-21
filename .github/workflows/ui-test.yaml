@@ -19,11 +19,11 @@ concurrency:
 
 jobs:
   test-ui:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     # Ships Chromium and its OS libraries pre-baked. Keep the tag in lockstep with
     # @playwright/test in tests/ui/package.json — a mismatch fails at startup.
     container:
-      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+      image: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:7852dc5a7d72f5fe458a597d690f6c42fbc8e9e26ddfa95f8e6ef552558d9bbf
       # Containers default to a 64 MB /dev/shm, which Chromium can exhaust and
       # then hang on. Cheaper and narrower than Playwright's --ipc=host advice.
       options: --shm-size=1g
@@ -45,7 +45,7 @@ jobs:
 
       - name: Upload the Playwright report
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: playwright-report
           path: |

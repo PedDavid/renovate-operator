@@ -94,6 +94,10 @@ spec:
             - name: BASE_PATH
               value: {{ $basePath | quote }}
             {{- end }}
+            {{- if .Values.rbac.ownNamespaceOnly }}
+            - name: CLUSTER_TEMPLATES_ENABLED
+              value: "false"
+            {{- end }}
             {{- if or .Values.rbac.ownNamespaceOnly .Values.rbac.watchNamespace }}
             - name: WATCH_NAMESPACE
               {{- if .Values.rbac.watchNamespace }}
@@ -250,6 +254,10 @@ spec:
             - name: VALKEY_TLS
               value: "true"
             {{- end }}
+            {{- if $ekv.cluster }}
+            - name: VALKEY_CLUSTER
+              value: "true"
+            {{- end }}
             {{- end }}
             {{- else if .Values.valkey.existingSecret }}
             - name: VALKEY_URL
@@ -290,6 +298,8 @@ spec:
               value: {{ join "," .Values.policy.allowedImages | quote }}
             - name: AUTHORIZATION_ENABLED
               value: {{ dig "enabled" true .Values.authorization | quote }}
+            - name: AUTHORIZATION_SUSPEND_FROM_UI
+              value: {{ dig "suspendFromUI" false .Values.authorization | quote }}
             {{- with .Values.authorization.defaults }}
             {{- with .readerGroups }}
             - name: AUTHORIZATION_DEFAULT_READER_GROUPS
